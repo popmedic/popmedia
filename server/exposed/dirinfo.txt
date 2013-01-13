@@ -1,0 +1,1 @@
+this directory contains the symlinks to the exposed directories of the media server.

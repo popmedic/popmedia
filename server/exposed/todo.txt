@@ -1,0 +1,1 @@
+create admin function to create an exposed directory and to delete an exposed directory.
