@@ -190,5 +190,5 @@ class PMMusicFile < PMFile
   end
 end
   
-musicfile = PMMusicFileInfo.new "/Volumes/MusicPop/Gotye/Making Mirrors 2011/01 - Making Mirrors.mp3"
-puts musicfile.to_json
+#musicfile = PMMusicFileInfo.new "/Volumes/MusicPop/Gotye/Making Mirrors 2011/01 - Making Mirrors.mp3"
+#puts musicfile.to_json
