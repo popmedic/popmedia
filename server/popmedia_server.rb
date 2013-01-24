@@ -10,12 +10,16 @@ $DEBUG_POP = true
 class PopMedia_Server
   def initialize
     load_cfg
+    @mime_types = WEBrick::HTTPUtils::DefaultMimeTypes
+    @mime_types.store("mp4", "video/mpeg")
+    @mime_types.store("mp3", "audio/mpeg")
     @server_name = Socket.gethostname
     @ip_addr = IPSocket.getaddress(@server_name)
     @server = WEBrick::HTTPServer.new(
       {
         :Port         => @port,
-        :DocumentRoot => @doc_root
+        :DocumentRoot => @doc_root,
+        :MimeTypes    => @mime_types
       }
     )
   end
