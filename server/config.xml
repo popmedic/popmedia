@@ -6,4 +6,5 @@
 		<type kind="av">mp4</type>
 		<type kind="a">mp3</type>
 	</media_types>
+	<apache_path>http://192.168.0.185/media2</apache_path>
 </configuration>

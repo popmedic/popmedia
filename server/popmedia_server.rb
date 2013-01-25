@@ -1,27 +1,21 @@
 #!/usr/local/bin/ruby
-require 'webrick'
-require "rexml/document"
-require "./dirlet.rb"
-require "./streamlet.rb"
 
+$FMT = ['html','xml','json']
 $CFGFNAME = 'config.xml'
 $DEBUG_POP = true
+
+require 'mongrel'
+require "rexml/document"
+require "./requires/cratehandler.rb"
+require "./requires/infohandler.rb"
+require "./requires/searchhandler.rb"
+require "./requires/streamhandler.rb"
 
 class PopMedia_Server
   def initialize
     load_cfg
-    @mime_types = WEBrick::HTTPUtils::DefaultMimeTypes
-    @mime_types.store("mp4", "video/mpeg")
-    @mime_types.store("mp3", "audio/mpeg")
     @server_name = Socket.gethostname
     @ip_addr = IPSocket.getaddress(@server_name)
-    @server = WEBrick::HTTPServer.new(
-      {
-        :Port         => @port,
-        :DocumentRoot => @doc_root,
-        :MimeTypes    => @mime_types
-      }
-    )
   end
   def load_cfg
     cfgfile = File.new $CFGFNAME
@@ -31,7 +25,8 @@ class PopMedia_Server
     @data_root = cfg_safe_get('/configuration/data_root', "%s/data" % Dir::pwd)
     @media_types = Array.new
     @av_types = Array.new
-    @a_types= Array.new
+    @a_types = Array.new
+    @apache_path = cfg_safe_get('/configuration/apache_path', false)
     @cfgxml.root.elements.each("/configuration/media_types/type") do |element|
       @media_types << element.text.downcase
       kind = element.attributes["kind"]
@@ -45,23 +40,37 @@ class PopMedia_Server
     end
   end
   def start
+    @server = Mongrel::HttpServer.new(@ip_addr, @port.to_s)
     trap("INT") do 
-      @server.shutdown 
+      puts "\n[%s] INFO  Stopping server: %s(%s:%s)" % [self.now, @server_name, @ip_addr, @port]
+      @server.stop 
     end
+    
     puts "[%s] INFO  Running on %s(%s:%s)" % [self.now, @server_name, @ip_addr, @port]
     puts "[%s] INFO  Exposed: %s" % [now, @doc_root]
     puts "[%s] INFO     Data: %s" % [now, @data_root]
     @media_types.each do |type| puts "[%s] INFO     Type: %s" % [now, type] end
     @av_types.each do |type| puts    "[%s] INFO   AVType: %s" % [now, type] end
     @a_types.each do |type| puts     "[%s] INFO    AType: %s" % [now, type] end
-    @server.mount '/dir', Dirlet, @doc_root, @data_root, @media_types
-    @server.mount '/stream', Streamlet
-    #@server.mount '/info', InfoServlet
-    #@server.mount '/admin', AdminServlet
-    @server.start
+    
+    @server.register('/stream', StreamHandler.new)
+    @server.register('/search', SearchHandler.new(@doc_root, @data_root, @apache_path, @media_types))
+    @server.register('/crate', CrateHandler.new(@doc_root, @data_root, @apache_path, @media_types))
+    @server.register('/info',   InfoHandler.new(@doc_root, @data_root, @apache_path, @media_types, @av_types, @a_types))
+    
+    Mongrel::DirHandler::add_mime_type('.mp4', 'video/mp4')
+    Mongrel::DirHandler::add_mime_type('.mp3', 'audio/mp3')
+    @server.register("/%s" % [@doc_root], Mongrel::DirHandler.new(@doc_root))
+    @server.register("/%s" % [@data_root], Mongrel::DirHandler.new(@data_root))
+    
+    @server.run.join
   end
   def cfg_safe_get(xpath, dflt='')
-    rtn = @cfgxml.root.elements[xpath].text
+    rtn = false
+    e = @cfgxml.root.elements[xpath]
+    if(e)
+      rtn = e.text
+    end
     if(!rtn) 
       rtn = dflt
     end
