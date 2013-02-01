@@ -2,6 +2,9 @@ require 'digest/md5'
 require "id3lib"
 
 class Image
+  @@crate_img  = "/images/crate.png"
+  @@afile_img  = "/images/afile.png"
+  @@avfile_img = "/images/avfile.png"
   def initialize data_root, path
     @data_root = data_root
     @path = File.realpath path
@@ -13,7 +16,7 @@ class Image
         if(File.extname(@path).downcase == '.mp3')
           return create_image "a"
         end
-        return ""
+        return @@crate_img
       end
     end
     return "/" << img_path
@@ -24,7 +27,6 @@ class Image
       if("a".casecmp(kind) == 0)
         #see if we have an album image already...
         crate_img_path = "%s/%s.jpg" % [@data_root, Digest::MD5.hexdigest(File.dirname(@path))]
-        puts crate_img_path
         if(File.exists?(crate_img_path))
           return "/" << crate_img_path
         end
@@ -38,7 +40,7 @@ class Image
         img_file.write(data)
         img_file.close
         if(!File.exists? img_path)
-          return ""
+          return @@afile_img
         end
       elsif("av".casecmp(kind) == 0)
         nfp = @path.gsub(/\.mp4$/, ".art[0].jpg")
@@ -47,14 +49,14 @@ class Image
           FileUtils.mv nfp, img_path
           return "/" << img_path
         else
-          return ""
+          return @@avfile_img
         end
       elsif("crate".casecmp(kind) == 0)
         if(!create_crate_image(img_path))
-          return ""
+          return @@crate_img
         end
       else
-        return ""
+        return @@crate_img
       end
     end
     return "/" << img_path

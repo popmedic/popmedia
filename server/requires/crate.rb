@@ -14,6 +14,12 @@ class CrateItem
                 "kind" => kind
               }
   end
+  def name
+    return @hash['name']
+  end
+  def kind
+    return @hash['kind']
+  end
   def to_json(*a)
     return @hash.to_json(*a)
   end
@@ -53,7 +59,7 @@ class Crate
   attr_reader :data_root
   attr_reader :types
   attr_reader :apache_path
-
+  
   def initialize(path, doc_root='', data_root='', apache_path=false, types=[])
     @doc_root = doc_root
     @crate = Array.new
@@ -69,7 +75,7 @@ class Crate
     @path = path
     @real_path = File.realpath path
     Dir.foreach(@real_path) do |file|
-      if(/^\./.match(file) == nil)
+      if(/^\.|_/.match(file) == nil)
         rf = "%s/%s" % [@real_path, file]
         f = "%s/%s" % [path, file]
         if(File.directory? rf)
@@ -142,12 +148,26 @@ class Crate
     Crate.dirwalk(doc_root, /#{search_str}/i, rtn) 
     return rtn
   end
+  def sort_crate
+    rtn = @crate.sort do |x, y|
+      if(x.kind == "crate" && y.kind == "info")
+        -1
+      elsif(y.kind == "crate" && x.kind == "info")
+        1
+      else
+        x.name <=> y.name
+      end
+    end
+    return rtn
+  end
   def to_json(*a)
-    return @crate.to_json(*a)
+    sc = sort_crate
+    return sc.to_json(*a)
   end
   def to_xml
+    sc = sort_crate
     rtn = "<crate>"
-    @crate.each do |crateitem|
+    sc.each do |crateitem|
       rtn << crateitem.to_xml
     end
     rtn << "</crate>"
@@ -155,7 +175,8 @@ class Crate
   end 
   def to_html
     rtn = "<html><body><h2>%s</h2><ul>" % [@path]
-    @crate.each do |crateitem|
+    sc =sort_crate
+    sc.each do |crateitem|
       rtn << "<li>" << crateitem.to_html << "</li>"
     end
     rtn << "</ul></body></html>"

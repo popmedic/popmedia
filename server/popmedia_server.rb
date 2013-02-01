@@ -62,6 +62,8 @@ class PopMedia_Server
     Mongrel::DirHandler::add_mime_type('.mp3', 'audio/mp3')
     @server.register("/%s" % [@doc_root], Mongrel::DirHandler.new(@doc_root))
     @server.register("/%s" % [@data_root], Mongrel::DirHandler.new(@data_root))
+    @server.register("/images", Mongrel::DirHandler.new("images"))
+    @server.register("/html", Mongrel::DirHandler.new('index.html'))
     
     @server.run.join
   end

@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=240,user-scalable=no" />
+        <title>Popmedia</title>
+        <style>
+			body 
+			{
+				background-color:#000;
+				color:#FFF;
+				font-family:Arial, Helvetica, sans-serif;
+				font-size:12pt;
+			}
+			#search_text
+			{
+				border-radius:5px;
+				border: #ECECEC 2px solid;
+				background-color: #000;
+				font-size:10pt;
+				color: #FFF;
+				padding-left:3px;
+			}
+			.bread_crumb
+			{
+				display:inline-block;
+				font-size:10pt;
+				margin:2px;
+				padding-left:4px;
+				padding-right:4px;
+				border:#ECECEC 1px solid;
+				border-radius:3px;
+				cursor:pointer;
+			}
+			.bread_crumb:hover
+			{
+				color:#A5A5A5;
+			}
+			.crate_item_info
+			{
+				width:100%;
+				display:block;
+				/*border:#AAA 2px solid;*/
+				border-radius: 5px;
+				padding:10px;
+				margin:5px;
+				text-align:left;
+				vertical-align:middle;
+				cursor:pointer;
+			}
+			.crate_item_info:hover
+			{
+				color:#A5A5A5;
+			}
+			.crate_item_info img
+			{
+				height:32px;
+				padding-right:10px;
+				cursor:pointer;
+			}
+			.crate_item_info .stream_button
+			{
+				display:inline-block;
+				text-align:right;
+				cursor:pointer;
+			}
+			.crate_item_crate
+			{
+				width:74px;
+				display:inline-block;
+				/*border:#AAA 2px solid;*/
+				border-radius: 5px;
+				padding:10px;
+				margin:5px;
+				text-align:center;
+				vertical-align:middle;
+				cursor:pointer;
+			}
+			.crate_item_crate:hover
+			{
+				color:#A5A5A5;
+			}
+			.crate_item_crate img
+			{
+				width:64px;
+				padding-bottom:10px;
+				cursor:pointer;
+			}
+			.info .section
+			{
+				display:inline-block;
+				vertical-align:top;
+				padding:10px;
+				text-align:center;
+				max-width:480px;
+				/*min-width:400px;*/
+			}
+			.info .section img
+			{
+				border: #EBEBEB 1px solid;
+				border-radius: 5px;
+				max-width:340px;
+			}
+			.info .section p
+			{
+				text-align:left;
+			}
+			.smaller
+			{
+				font-size:smaller;
+			}
+			#canvas
+			{
+				/*background-color:#686868;*/
+				border-radius:5px;
+				border: #ECECEC 2px solid;
+				margin: 5px;
+				padding:10px;
+			}
+		</style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+        <script>
+			base_path = "/crate/exposed/json";
+			bread_crumb_names = [];
+			function add_bread_crumb(name, href)
+			{
+				$("#bread_crumbs").append("<div class=\"bread_crumb\" href=\""+ href +"\" name=\""+name+"\">"+name+"</div>");
+				bread_crumb_names.push(name);
+				$("#bread_crumbs .bread_crumb").last().click(function(){
+					query($(this).attr("href"));
+					remove_bread_crumb(name);
+				});
+			}
+			function remove_bread_crumb(name)
+			{
+				i = bread_crumb_names.indexOf(name)+1;
+				for(;i < bread_crumb_names.length && i > -1; i++)
+				{
+					$(".bread_crumb[name=\""+bread_crumb_names[i]+"\"]").remove();
+				}
+			}
+			function draw_crate(crate){
+				crate.forEach(function(itm){
+					if(itm.kind == "crate")
+					{
+						$('#canvas').append("<div class=\"crate_item_crate\" href=\""+itm.info+"/json\" name=\""+itm.name+"\" kind=\""+itm.kind+"\">"+
+											"<img src=\""+itm.image+"\" /><br />"+itm.name+"</div>");
+					}
+					else if(itm.kind == "info")
+					{
+						$('#canvas').append("<div class=\"crate_item_info\" href=\""+itm.info+"/json\" name=\""+itm.name+"\" kind=\""+itm.kind+"\">"+
+											"<img src=\""+itm.image+"\" />"+itm.name+/*"<div class=\"stream_button\" href=\""+itm.stream+"\">"+
+											"<img src=\"/images/play_button.png\" /></div>*/"</div>");
+					}
+				});
+				$("#canvas .crate_item_info").click(function(){
+					query($(this).attr("href"));
+				});
+				$("#canvas .crate_item_crate").click(function(){
+					query($(this).attr("href"));
+					add_bread_crumb($(this).attr("name"), $(this).attr("href"));
+				});
+			}
+			function draw_info(info){
+				if(info.type == "av")
+				{
+					str = "<div class=\"info\"><h1>"+info.Name+"</h1><div class=\"section\">";
+					str += "<img src=\""+info.image+"\" /><p></p><a href=\""+info.href+"\" target=\"_blank\">"+
+						   "<img src=\"/images/play_button.png\" /></a></div><div class=\"section\">";
+					if(info.Media_Type == "TV Show")
+					{
+						str += "<h2>"+info.TV_Show+"</h2><h3>"+info.Album+"</h3>"+
+							   "<b>Season: "+info.TV_Season+"</b>&nbsp;<b>Episode: "+info.TV_Episode+"</b><p>"+
+							   info.Short_Description+"</p><p class=\"smaller\">Genre: "+info.Genre+"<br />Cast: "+
+							   info.Artist+"<br />Writer: "+info.Composer+"<br />Director: "+info.Album_Artist+"<br />Network: "+
+							   info.TV_Network+"</p>"
+					}
+					else
+					{
+						str += "<h2>"+info.Album+"</h2><h3><p>"+info.Short_Description+"</p></h3>"+
+							   "<b>"+info.Genre+"</b><p class=\"smaller\"><center>"+
+							   info.Artist+"</center></p>"
+					}
+					str += "</div></div>";
+				}
+				else if(info.type == "a")
+				{
+					str = "<div class=\"info\"><h1>"+info.track+" "+info.title+"</h1><div class=\"section\">";
+					str += "<img src=\""+info.image+"\" /><p></p><a href=\""+info.href+"\" target=\"_blank\">"+
+						   "<img src=\"/images/play_button.png\" /></a></div><div class=\"section\">";
+					str += "<h2>"+info.album+"</h2><h3>"+info.artist+"</h3>"+
+							   "<p>Year: "+info.year+"<br />Genre: "+info.genre+"</p>"
+					str += "</div></div>";
+				}
+				$('#canvas').append(str);
+			}
+			function draw_canvas(res){
+				$('#canvas').html('');
+				if(res instanceof Array)
+				{
+					if(res.length <= 0) 
+					{
+						alert("no data returned");
+					}
+					else
+					{
+						draw_crate(res);
+					}
+				}
+				else 
+				{
+					draw_info(res);
+				}
+			}
+			function query(url)
+			{
+				$('#canvas').text("LOADING...");
+				$.ajax({
+  					url: url
+				}).done(function(res) {
+					draw_canvas(res);
+				}).fail(function() { 
+					alert("error: unable to retrieve base data."); 
+				}).always(function() { 
+					//alert("AJAX complete.");
+				});
+			}
+			$(document).ready(function(){
+				$('#search_text').keydown(function(event){
+					if(event.which == 13) {
+						if(bread_crumb_names.length > 1) remove_bread_crumb(bread_crumb_names[0]);
+						query("/search/"+encodeURIComponent($(this).val())+"/json");
+					}
+				});
+				
+				add_bread_crumb("Home", base_path);
+				query(base_path);
+			});
+		</script>
+	</head>
+    <body>
+		<table width="100%">
+        	<tr>
+            	<td align="left" id="bread_crumbs"></td>
+            	<td align="right">
+                	<!--label for="search_text">Search:</label--><input type="text" value="" id="search_text" placeholder="Search..." />
+                </td>
+      		</tr>
+      	</table>
+        <div id="canvas">
+        </div>
+	</body>
+</html>
