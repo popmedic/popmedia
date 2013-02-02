@@ -38,9 +38,9 @@
 			}
 			.crate_item_info
 			{
-				width:100%;
+				/*height:46px;*/
 				display:block;
-				/*border:#AAA 2px solid;*/
+				border:#2F2F2F 1px solid;
 				border-radius: 5px;
 				padding:10px;
 				margin:5px;
@@ -51,10 +51,11 @@
 			.crate_item_info:hover
 			{
 				color:#A5A5A5;
+				border-color:#A5A5A5;
 			}
 			.crate_item_info img
 			{
-				height:32px;
+				height:46px;
 				padding-right:10px;
 				cursor:pointer;
 			}
@@ -66,7 +67,7 @@
 			}
 			.crate_item_crate
 			{
-				width:74px;
+				width:84px;
 				display:inline-block;
 				/*border:#AAA 2px solid;*/
 				border-radius: 5px;
@@ -82,7 +83,7 @@
 			}
 			.crate_item_crate img
 			{
-				width:64px;
+				width:80px;
 				padding-bottom:10px;
 				cursor:pointer;
 			}
@@ -133,11 +134,12 @@
 			}
 			function remove_bread_crumb(name)
 			{
-				i = bread_crumb_names.indexOf(name)+1;
-				for(;i < bread_crumb_names.length && i > -1; i++)
+				idx = bread_crumb_names.indexOf(name)+1;
+				for(i = idx;i < bread_crumb_names.length && i > -1; i++)
 				{
 					$(".bread_crumb[name=\""+bread_crumb_names[i]+"\"]").remove();
 				}
+				bread_crumb_names.splice(idx, bread_crumb_names.length - idx);
 			}
 			function draw_crate(crate){
 				crate.forEach(function(itm){

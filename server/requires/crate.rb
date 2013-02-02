@@ -82,7 +82,7 @@ class Crate
           kind = "crate"
           img_path = Image.new(@data_root, rf).create_image kind
           @crate << CrateItem.new(
-                                    file.chomp(File.extname(file)), #name
+                                    file, #name
                                     URI.escape("/%s/%s" % [kind, f]), #info
                                     URI.escape("/%s/%s" % [@doc_root, f]), #href
                                     '', #stream
@@ -129,8 +129,12 @@ class Crate
                 ap = rtn.apache_path.gsub(/\/$/,'')
                 strm = "%s/%s" % [ap, fl]
               end
+              fn = f
+              if(kind == "info") 
+                fn = f.chomp(File.extname(f))
+              end
               rtn.crate << CrateItem.new(
-                                        f.chomp(File.extname(f)), 
+                                        fn,
                                         URI.escape("/%s/%s" % [kind, fl]), 
                                         URI.escape("/%s" % [fl]), 
                                         URI.escape(strm),
