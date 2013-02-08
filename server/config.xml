@@ -1,7 +1,5 @@
 <configuration>
 	<port>8080</port>
-	<doc_root>exposed</doc_root>
-	<data_root>data</data_root>
 	<media_types>
 		<type kind="av">mp4</type>
 		<type kind="a">mp3</type>

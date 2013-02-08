@@ -21,8 +21,8 @@ class PopMedia_Server
     cfgfile = File.new $CFGFNAME
     @cfgxml = REXML::Document.new cfgfile
     @port      = cfg_safe_get('/configuration/port'     , '8080').to_i
-    @doc_root  = cfg_safe_get('/configuration/doc_root' , "%s/exposed" % Dir::pwd)
-    @data_root = cfg_safe_get('/configuration/data_root', "%s/data" % Dir::pwd)
+    @doc_root  = "exposed" # cfg_safe_get('/configuration/doc_root' , "%s/exposed" % Dir::pwd)
+    @data_root = "data" # cfg_safe_get('/configuration/data_root', "%s/data" % Dir::pwd)
     @media_types = Array.new
     @av_types = Array.new
     @a_types = Array.new

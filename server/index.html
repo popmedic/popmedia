@@ -21,6 +21,15 @@
 				color: #FFF;
 				padding-left:3px;
 			}
+			#find_text
+			{
+				border-radius:5px;
+				border: #ECECEC 2px solid;
+				background-color: #000;
+				font-size:10pt;
+				color: #FFF;
+				padding-left:3px;
+			}
 			.bread_crumb
 			{
 				display:inline-block;
@@ -35,6 +44,27 @@
 			.bread_crumb:hover
 			{
 				color:#A5A5A5;
+			}
+			.info .button
+			{
+				display:inline-block;
+				font-size:12pt;
+				margin:2px;
+				margin-top:16px;
+				width:120px;
+				padding-left:4px;
+				padding-right:4px;
+				border:#ECECEC 1px solid;
+				border-radius:3px;
+				cursor:pointer;
+			}
+			.info .button:hover
+			{
+				color:#A5A5A5;
+			}
+			.info .link
+			{
+				cursor:pointer;
 			}
 			.crate_item_info
 			{
@@ -102,6 +132,10 @@
 				border-radius: 5px;
 				max-width:340px;
 			}
+			.info #poster
+			{
+				width:340px;
+			}
 			.info .section p
 			{
 				text-align:left;
@@ -117,12 +151,34 @@
 				border: #ECECEC 2px solid;
 				margin: 5px;
 				padding:10px;
+				height:540px;
+				overflow:scroll;
 			}
 		</style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
         <script>
 			base_path = "/crate/exposed/json";
 			bread_crumb_names = [];
+			last_crate = [];
+			var TRange=null;
+
+			function gen_info_key(str)
+			{
+				return str.substring(str.lastIndexOf('/')+1).replace(/,/g, '').
+															 replace(/\?/g, '').
+															 replace(/\#/g, '').
+															 replace(/\!/g, '');
+			}
+			function add_slashes(string) {
+				return string.replace(/\\/g, '\\\\').
+					replace(/\u0008/g, '\\b').
+					replace(/\t/g, '\\t').
+					replace(/\n/g, '\\n').
+					replace(/\f/g, '\\f').
+					replace(/\r/g, '\\r').
+					replace(/'/g, '\\\'').
+					replace(/"/g, '\\"');
+			}
 			function add_bread_crumb(name, href)
 			{
 				$("#bread_crumbs").append("<div class=\"bread_crumb\" href=\""+ href +"\" name=\""+name+"\">"+name+"</div>");
@@ -141,34 +197,68 @@
 				}
 				bread_crumb_names.splice(idx, bread_crumb_names.length - idx);
 			}
-			function draw_crate(crate){
-				crate.forEach(function(itm){
-					if(itm.kind == "crate")
+			function next_info(key)
+			{
+				for (i = 0; i < last_crate.length; i++)
+				{
+					info = last_crate[i];
+					k = gen_info_key(info.stream);
+					if(key == k)
 					{
-						$('#canvas').append("<div class=\"crate_item_crate\" href=\""+itm.info+"/json\" name=\""+itm.name+"\" kind=\""+itm.kind+"\">"+
-											"<img src=\""+itm.image+"\" /><br />"+itm.name+"</div>");
+						r = i+1;
+						if (r >= last_crate.length)
+						{
+							r = 0;
+						}
+						return last_crate[r];
 					}
-					else if(itm.kind == "info")
+				}
+				alert("Unable to find: "+name);
+				return last_crate[0];
+			}
+			function prev_info(key)
+			{
+				for (i = 0; i < last_crate.length; i++)
+				{
+					info = last_crate[i];
+					k = gen_info_key(info.stream);
+					if(key == k)
 					{
-						$('#canvas').append("<div class=\"crate_item_info\" href=\""+itm.info+"/json\" name=\""+itm.name+"\" kind=\""+itm.kind+"\">"+
-											"<img src=\""+itm.image+"\" />"+itm.name+/*"<div class=\"stream_button\" href=\""+itm.stream+"\">"+
-											"<img src=\"/images/play_button.png\" /></div>*/"</div>");
+						r = i-1;
+						if (r < 0)
+						{
+							r = last_crate.length-1;
+						}
+						return last_crate[r];
 					}
-				});
-				$("#canvas .crate_item_info").click(function(){
-					query($(this).attr("href"));
-				});
-				$("#canvas .crate_item_crate").click(function(){
-					query($(this).attr("href"));
-					add_bread_crumb($(this).attr("name"), $(this).attr("href"));
-				});
+				}
+				alert("Unable to find: "+name);
+				return last_crate[0];
+			}
+			function prev_click(key)
+			{
+				pi = prev_info(key);
+				query(pi.info+'/json');
+			}
+			function next_click(key)
+			{
+				ni = next_info(key);
+				query(ni.info+'/json');
 			}
 			function draw_info(info){
+				str = "<div class=\"error\">unable to retrieve info on "+info.href+"</div>"
 				if(info.type == "av")
 				{
-					str = "<div class=\"info\"><h1>"+info.Name+"</h1><div class=\"section\">";
-					str += "<img src=\""+info.image+"\" /><p></p><a href=\""+info.href+"\" target=\"_blank\">"+
-						   "<img src=\"/images/play_button.png\" /></a></div><div class=\"section\">";
+					str = "<div class=\"info\">"+
+						  "<h1>"+info.Name+"</h1><div class=\"section\">"+
+						  "<img src=\""+info.image+"\" id=\"poster\" /><p></p>"+
+						  "<img src=\"/images/play_button.png\" class=\"link\" onclick=\"javasript:"+
+						  "draw_player('"+info.image+"', '"+add_slashes(info.href)+"')\" id=\"play_button\" />"+
+						  "<div><div class=\"button\" onclick=\"javascript:"+
+						  "prev_click('"+add_slashes(encodeURIComponent(gen_info_key(info.href)))+"');\">Previous</div>"+
+						  "<div class=\"button\" onclick=\"javascript:"+
+						  "next_click('"+add_slashes(encodeURIComponent(gen_info_key(info.href)))+"');\">Next</div></div>"+
+						  "</div><div class=\"section\">";
 					if(info.Media_Type == "TV Show")
 					{
 						str += "<h2>"+info.TV_Show+"</h2><h3>"+info.Album+"</h3>"+
@@ -187,14 +277,89 @@
 				}
 				else if(info.type == "a")
 				{
-					str = "<div class=\"info\"><h1>"+info.track+" "+info.title+"</h1><div class=\"section\">";
-					str += "<img src=\""+info.image+"\" /><p></p><a href=\""+info.href+"\" target=\"_blank\">"+
-						   "<img src=\"/images/play_button.png\" /></a></div><div class=\"section\">";
-					str += "<h2>"+info.album+"</h2><h3>"+info.artist+"</h3>"+
-							   "<p>Year: "+info.year+"<br />Genre: "+info.genre+"</p>"
-					str += "</div></div>";
+					str = "<div class=\"info\">"+
+						  "<h1>"+info.track+" "+info.title+"</h1><div class=\"section\">"+
+					      "<img src=\""+info.image+"\" /><p></p><audio controls autoplay onended=\"javascript:"+
+						  "next_click('"+add_slashes(encodeURIComponent(gen_info_key(info.href)))+"');\">"+
+						  "<source src=\""+info.href+"\" type=\"audio/mpeg\"></audio>"+
+						  "<div><div class=\"button\" onclick=\"javascript:"+
+					      "prev_click('"+add_slashes(encodeURIComponent(gen_info_key(info.href)))+"');\">Previous</div>"+
+						  "<div class=\"button\" onclick=\"javascript:"+
+						  "next_click('"+add_slashes(encodeURIComponent(gen_info_key(info.href)))+"');\">Next</div>"+
+						  "</div></div><div class=\"section\"><h2>"+info.album+"</h2><h3>"+info.artist+"</h3>"+
+						  "<p>Year: "+info.year+"<br />Genre: "+info.genre+"</p>"+
+						  "</div></div>";
 				}
 				$('#canvas').append(str);
+			}
+			function draw_player(img, href)
+			{
+				if($(".info #poster").length == 1)
+				{
+					w = $(".info #poster").width()+2;
+					h = $(".info #poster").height();	
+					s = $(".info #poster").attr("src");
+					
+					$(".info .section").first().replaceWith("<div class=\"section\"><video id=\"vplayer\" controls autoplay"+
+								" onended=\"javascript:"+
+						  		"next_click('"+add_slashes(encodeURIComponent(gen_info_key(href)))+"');\">"+
+								"<source id=\"vsrc\" src=\""+href+"\" type=\"video/mp4\"></video><p></p>"+
+								"<img src=\"/images/play_button.png\" class=\"link\" onclick=\"javasript:"+
+								"draw_player('"+img+"', '"+add_slashes(href)+"');\" id=\"play_button\" />"+
+								"<div><div class=\"button\" onclick=\"javascript:"+
+								"prev_click('"+add_slashes(encodeURIComponent(gen_info_key(href)))+"');\">Previous</div>"+
+								"<div class=\"button\" onclick=\"javascript:"+
+								"next_click('"+add_slashes(encodeURIComponent(gen_info_key(href)))+"');\">Next</div></div></div>");
+								
+					$("#vplayer #vsrc").attr('src', href);
+					$("#vplayer").width(w);
+					$("#vplayer").height(h);
+					
+					$(".info #play_button").attr('src', '/images/stop_button.png');
+				}
+				else
+				{
+					w = $(".info #vplayer").width();
+					h = $(".info #vplayer").height()	
+				
+					$(".info .section").first().replaceWith("<div class=\"section\"><img src=\""+img+"\" id=\"poster\" /><p></p>"+
+								"<img src=\"/images/play_button.png\" class=\"link\" onclick=\"javasript:"+
+								"draw_player('"+img+"', '"+add_slashes(href)+"');\" id=\"play_button\" />"+
+								"<div><div class=\"button\" onclick=\"javascript:"+
+								"prev_click('"+add_slashes(encodeURIComponent(gen_info_key(href)))+"');\">Previous</div>"+
+								"<div class=\"button\" onclick=\"javascript:"+
+								"next_click('"+add_slashes(encodeURIComponent(gen_info_key(href)))+"');\">Next</div></div></div>");
+				
+					$(".info #poster").width(w);
+					$(".info #poster").height(h);
+					
+					$(".info #play_button").attr('src', '/images/play_button.png');
+				}
+			}
+			function draw_crate(crate){
+				last_crate = crate;
+				crate.forEach(function(itm){
+					if(itm.kind == "crate")
+					{
+						$('#canvas').append("<div class=\"crate_item_crate\" "+
+											"href=\""+itm.info+"/json\" name=\""+itm.name+"\" kind=\""+itm.kind+"\">"+
+											"<img src=\""+itm.image+"\" /><br />"+itm.name+"</div>");
+					}
+					else if(itm.kind == "info")
+					{
+						$('#canvas').append("<div class=\"crate_item_info\" "+
+											"href=\""+itm.info+"/json\" name=\""+itm.name+"\" kind=\""+itm.kind+"\">"+
+											"<img src=\""+itm.image+"\" />"+itm.name+"</div>");
+					}
+				});
+				$("#canvas .crate_item_info").click(function(){
+					query($(this).attr("href"));
+				});
+				$("#canvas .crate_item_crate").click(function(){
+					query($(this).attr("href"));
+					add_bread_crumb($(this).attr("name"), $(this).attr("href"));
+				});
+				
 			}
 			function draw_canvas(res){
 				$('#canvas').html('');
@@ -202,7 +367,7 @@
 				{
 					if(res.length <= 0) 
 					{
-						alert("no data returned");
+						$("#canvas").append("<div class=\"error\">no data returned</div>");
 					}
 					else
 					{
@@ -227,6 +392,7 @@
 					//alert("AJAX complete.");
 				});
 			}
+			
 			$(document).ready(function(){
 				$('#search_text').keydown(function(event){
 					if(event.which == 13) {
@@ -234,7 +400,13 @@
 						query("/search/"+encodeURIComponent($(this).val())+"/json");
 					}
 				});
-				
+				$("#find_text").keydown(function(event){
+					if(event.which == 13)
+					{
+						window.find($(this).val(),0,0,1,0,0);
+					}
+				});
+		
 				add_bread_crumb("Home", base_path);
 				query(base_path);
 			});
@@ -245,7 +417,8 @@
         	<tr>
             	<td align="left" id="bread_crumbs"></td>
             	<td align="right">
-                	<!--label for="search_text">Search:</label--><input type="text" value="" id="search_text" placeholder="Search..." />
+                <input type="text" value="" id="find_text" placeholder="Find on page..." />
+                <input type="text" value="" id="search_text" placeholder="Search..." />
                 </td>
       		</tr>
       	</table>
