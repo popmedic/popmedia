@@ -120,8 +120,11 @@ class Crate
   		      kind = "crate"
   		      do_search = true
   		    end
+  		    if(f[0,1] == ".")
+  		    	do_search = false
+  		    end
   		    if(do_search)
-    		    if qry =~ f
+  		    	if (qry =~ f) != nil
     			    fl = dir + "/" + f
     			    img_path = Image.new(rtn.data_root, File.realpath(fl)).image_path
               strm = "/stream/%s" % [fl] #stream
@@ -147,9 +150,13 @@ class Crate
   	  end
     end
   end
-  def Crate::search(search_str, doc_root='', data_root='', apache_path=false, types=[])
+  def Crate::search(search_str, doc_root='', data_root='', apache_path=false, types=[], from=false)
     rtn = Crate.new(false, doc_root, data_root, apache_path, types)
-    Crate.dirwalk(doc_root, /#{search_str}/i, rtn) 
+    if(!from)
+    	Crate.dirwalk(doc_root, /#{search_str}/i, rtn)
+    else
+    	Crate.dirwalk(from, /#{search_str}/i, rtn)
+    end
     return rtn
   end
   def sort_crate

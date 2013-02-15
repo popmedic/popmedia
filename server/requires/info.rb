@@ -1,4 +1,5 @@
 require "rubygems"
+require "mp3info"
 require "id3lib"
 require 'mongrel'
 require 'fileutils'
@@ -55,37 +56,37 @@ class Info
     end
   end
   def audio_info
-    tag = ID3Lib::Tag.new(@real_path)
-    if(tag.title)
-      @hash['title'] = tag.title.encode
-    end
-    if(tag.album)
-      @hash['album'] = tag.album.encode
-    end
-    if(tag.artist) 
-      @hash['artist'] = tag.artist.encode
-    end
-    if(tag.comment) 
-      @hash['comment'] = tag.comment.encode
-    end
-    if(tag.track)
-      @hash['track'] = tag.track.encode
-    end
-    if(tag.time)
-      @hash['time'] = tag.time.encode
-    end
-    if(tag.year) 
-      @hash['year'] = tag.year.encode
-    end
-    if(tag.publisher)
-      @hash['publisher'] = tag.publisher.encode
-    end
-    if(tag.genre)
-      @hash['genre'] = tag.genre.encode
-    end
-    if(tag.frame(:APIC))
-      @hash["image"] = Image.new(@data_root, @real_path).create_image('a', tag.frame(:APIC)[:data])
-    end
+    #tag = ID3Lib::Tag.new(@real_path)
+    Mp3Info.open @real_path do |mp3|
+			if(mp3.tag.title)
+				@hash['title'] = mp3.tag.title
+			end
+			if(mp3.tag.album)
+				@hash['album'] = mp3.tag.album
+			end
+			if(mp3.tag.artist) 
+				@hash['artist'] = mp3.tag.artist
+			end
+			if(mp3.tag.comment) 
+				@hash['comment'] = mp3.tag.comment
+			end
+			if(mp3.tag.tracknum)
+				@hash['track'] = mp3.tag.tracknum
+			end
+			if(mp3.tag.time)
+				@hash['time'] = mp3.tag.time
+			end
+			if(mp3.tag.year) 
+				@hash['year'] = mp3.tag.year
+			end
+			if(mp3.tag.publisher)
+				@hash['publisher'] = mp3.tag.publisher
+			end
+			if(mp3.tag.genre)
+				@hash['genre'] = mp3.tag.genre
+			end
+			@hash["image"] = Image.new(@data_root, @real_path).create_image('a')#, data)
+		end
   end
   def to_html
     rtn = "<html><body><h2><a href=\"%s\">%s</a></h2><table><tr><td width=\"20%%\"><img width=\"240px\" src=\"%s\"/></td><td><ul>" % [@hash['href'], File.basename(@path).chomp(File.extname(@path)), @hash['image']]

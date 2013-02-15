@@ -21,9 +21,15 @@ class SearchHandler < Mongrel::HttpHandler
             path = path.chomp(cfmt)
           end
         end
+        from = false
+        if((/\/from\// =~ path) != nil)
+        	spl = path.split(/\/from\//)
+        	path = spl[0]
+        	from = spl[1]
+        end
         head["Content-Type"] = "text/%s" % [fmt]
         str = ".*" << path.gsub(/ /, '.*') << ".*"
-        crate = Crate.search(str, @doc_root, @data_root, @apache_path, @media_types)
+        crate = Crate.search(str, @doc_root, @data_root, @apache_path, @media_types, from)
         if(fmt == "html")
           out << crate.to_html
         elsif(fmt == "json")

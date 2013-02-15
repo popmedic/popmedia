@@ -20,6 +20,7 @@
 				font-size:10pt;
 				color: #FFF;
 				padding-left:3px;
+				width:120px;
 			}
 			#find_text
 			{
@@ -29,6 +30,17 @@
 				font-size:10pt;
 				color: #FFF;
 				padding-left:3px;
+				width:120px;
+			}
+			#search_crate_text
+			{
+				border-radius:5px;
+				border: #ECECEC 2px solid;
+				background-color: #000;
+				font-size:10pt;
+				color: #FFF;
+				padding-left:3px;
+				width:120px;
 			}
 			.bread_crumb
 			{
@@ -167,7 +179,10 @@
 				return str.substring(str.lastIndexOf('/')+1).replace(/,/g, '').
 															 replace(/\?/g, '').
 															 replace(/\#/g, '').
-															 replace(/\!/g, '');
+															 replace(/\!/g, '').
+															 replace(/\;/g, '').
+															 replace(/\@/g, '').
+															 replace(/\&/g, '');
 			}
 			function add_slashes(string) {
 				return string.replace(/\\/g, '\\\\').
@@ -177,7 +192,8 @@
 					replace(/\f/g, '\\f').
 					replace(/\r/g, '\\r').
 					replace(/'/g, '\\\'').
-					replace(/"/g, '\\"');
+					replace(/"/g, '\\"').
+					replace(/\?/g, '\\?');
 			}
 			function add_bread_crumb(name, href)
 			{
@@ -305,7 +321,7 @@
 						  		"next_click('"+add_slashes(encodeURIComponent(gen_info_key(href)))+"');\">"+
 								"<source id=\"vsrc\" src=\""+href+"\" type=\"video/mp4\"></video><p></p>"+
 								"<img src=\"/images/play_button.png\" class=\"link\" onclick=\"javasript:"+
-								"draw_player('"+img+"', '"+add_slashes(href)+"');\" id=\"play_button\" />"+
+								"draw_player('"+img+"', '"+add_slashes(encodeURIComponent(href))+"');\" id=\"play_button\" />"+
 								"<div><div class=\"button\" onclick=\"javascript:"+
 								"prev_click('"+add_slashes(encodeURIComponent(gen_info_key(href)))+"');\">Previous</div>"+
 								"<div class=\"button\" onclick=\"javascript:"+
@@ -387,7 +403,7 @@
 				}).done(function(res) {
 					draw_canvas(res);
 				}).fail(function() { 
-					alert("error: unable to retrieve base data."); 
+					$('#canvas').text("<div class=\"error\">error: unable to retrieve base data.</div>"); 
 				}).always(function() { 
 					//alert("AJAX complete.");
 				});
@@ -406,6 +422,15 @@
 						window.find($(this).val(),0,0,1,0,0);
 					}
 				});
+				$('#search_crate_text').keydown(function(event){
+					if(event.which == 13) {
+						searchstr = "/search/"+encodeURIComponent(
+										$(this).val()
+								)+"/from/"+$("#bread_crumbs .bread_crumb").last().attr('href').replace(/^\/crate\//, '')
+						/*if(bread_crumb_names.length > 1) remove_bread_crumb(bread_crumb_names[0]);*/
+						query(searchstr);
+					}
+				});
 		
 				add_bread_crumb("Home", base_path);
 				query(base_path);
@@ -415,10 +440,13 @@
     <body>
 		<table width="100%">
         	<tr>
-            	<td align="left" id="bread_crumbs"></td>
-            	<td align="right">
+            	<td align="left" id="bread_crumbs" style="white-space:nowrap"></td>
+            	<td align="left" width="100%">
+                <input type="text" value="" id="search_crate_text" placeholder="Search crate..." />
+                <td>
+                <td align="right" style="white-space:nowrap">
                 <input type="text" value="" id="find_text" placeholder="Find on page..." />
-                <input type="text" value="" id="search_text" placeholder="Search..." />
+                <input type="text" value="" id="search_text" placeholder="Search site..." />
                 </td>
       		</tr>
       	</table>

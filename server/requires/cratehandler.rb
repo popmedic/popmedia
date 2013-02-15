@@ -12,6 +12,7 @@ class CrateHandler < Mongrel::HttpHandler
   def process(req, res)
     res.start(200) do |head,out|
       begin
+    		puts ("incoming: %s" % req.params["REQUEST_PATH"])
         path = URI.unescape(req.params["REQUEST_PATH"]).gsub(/^\/crate\/{0,1}/, '').gsub(/\/$/, '')
         fmt = "html"
         if($FMT != nil)
