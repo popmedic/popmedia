@@ -1,6 +1,6 @@
 require 'mongrel'
 require 'json'
-require './requires/crate.rb'
+require_relative './crate.rb'
 
 class CrateHandler < Mongrel::HttpHandler
   def initialize doc_root='exposed', data_root='data', apache_path=false, types=['mp4', 'mp3']

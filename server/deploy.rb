@@ -39,9 +39,23 @@ FileUtils.rm_r dpath + 'images', :force => true
 puts "cp -r 'images', "+ dpath
 FileUtils.cp_r 'images', dpath
 
-if !File.exists?(dpath+'data')
-	puts "mkdir " + dpath+'data'
-	FileUtils.mkpath dpath+'data'
+if File.exists?(dpath+'data')
+	#if !File.symlink?(dpath+'data')
+	#	puts "mv "+dpath+"data, "+dpath+'_data'
+	#	FileUtils.mv dpath+'data', dpath+'_data'
+	#	puts "ln -s "+dpath+'_data'+", "+dpath+'data'
+	#	FileUtils.ln_s dpath+'_data', dpath+'data'
+	#end
+else
+	if !File.exists?(dpath+'_data')
+		puts "mkdir " + dpath+'_data'
+		FileUtils.mkpath dpath+'_data'
+		puts "ln -s "+dpath+'_data'+", "+dpath+'data'
+		FileUtils.ln_s dpath+'_data', dpath+'data'
+	else
+		puts "ln -s "+dpath+'_data'+", "+dpath+'data'
+		FileUtils.ln_s dpath+'_data', dpath+'data'
+	end
 end
 
 if !File.exists?(dpath+'exposed')

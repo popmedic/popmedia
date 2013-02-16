@@ -6,10 +6,12 @@ $DEBUG_POP = true
 
 require 'mongrel'
 require "rexml/document"
-require "./requires/cratehandler.rb"
-require "./requires/infohandler.rb"
-require "./requires/searchhandler.rb"
-require "./requires/streamhandler.rb"
+
+require_relative "./requires/cratehandler.rb"
+require_relative "./requires/infohandler.rb"
+require_relative "./requires/searchhandler.rb"
+require_relative "./requires/streamhandler.rb"
+require_relative "./requires/adminhandler.rb"
 
 class PopMedia_Server
   def initialize
@@ -57,6 +59,7 @@ class PopMedia_Server
     @server.register('/search', SearchHandler.new(@doc_root, @data_root, @apache_path, @media_types))
     @server.register('/crate', CrateHandler.new(@doc_root, @data_root, @apache_path, @media_types))
     @server.register('/info',   InfoHandler.new(@doc_root, @data_root, @apache_path, @media_types, @av_types, @a_types))
+    @server.register('/admin',   AdminHandler.new(@doc_root, @data_root, @apache_path, @media_types))
     
     Mongrel::DirHandler::add_mime_type('.mp4', 'video/mp4')
     Mongrel::DirHandler::add_mime_type('.mp3', 'audio/mp3')

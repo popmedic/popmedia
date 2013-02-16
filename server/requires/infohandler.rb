@@ -1,6 +1,6 @@
 require 'mongrel'
 require 'json'
-require './requires/info.rb'
+require_relative './info.rb'
 
 class InfoHandler < Mongrel::HttpHandler
   def initialize doc_root='', data_root='', apache_path=false, types=[], av_types=[], a_types=[]

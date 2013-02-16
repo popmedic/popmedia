@@ -1,7 +1,7 @@
 require 'mongrel'
 require 'json'
 require 'cgi'
-require './requires/image.rb'
+require_relative './image.rb'
 
 class CrateItem
   def initialize(name, info, href, stream, image, kind)
