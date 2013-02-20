@@ -40,7 +40,9 @@ class Info
     end
   end
   def av_info
-    mp4info_rtn = IO.popen(["mp4info", @real_path], in: :close, err: :close).read
+  	io = IO.popen(["mp4info", @real_path], in: :close, err: :close)
+    mp4info_rtn = io.read
+    io.close
     mp4info_rtn.split(/\n/).each do |line|
       if(/^ /.match(line) != nil)
         nv = line.split(/\:/, 2)

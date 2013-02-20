@@ -116,7 +116,20 @@ class AdminHandler < Mongrel::HttpHandler
         		FileUtils.rm rm
         	end
         elsif ((md = /^set_data_path\/(.+)\/{0,1}/.match(path)) != nil)
-        	
+        	nd = md[1]
+        	if(File.exists?(nd))
+        		if(File.directory?(nd))
+							if(File.exists?(@data_root))
+								FileUtils.rm @data_root
+							end
+							@msg = {"result" => "SUCCESS", "msg" => "ln -s \"%s\" \"%s\"" % [nd, @data_root]}
+							FileUtils.ln_s nd, @data_root
+						else
+							@msg = {"result" => "FAILURE", "msg" => "FILE IS NOT A DIRECTORY: " << nd}
+        		end
+        	else 
+        		@msg = {"result" => "FAILURE", "msg" => "FILE DOES NOT EXIST: " << nd}
+        	end
         end
         if fmt == 'json'
         	out << to_json

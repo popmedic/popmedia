@@ -85,6 +85,6 @@ class PopMedia_Server
     return Time.now.to_s.sub(/ [\-\+][0-9]{4}$/, '')
   end
 end
-
+Dir.chdir(File.dirname(__FILE__))
 s = PopMedia_Server.new
 s.start
