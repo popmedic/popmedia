@@ -26,10 +26,12 @@ end
 
 puts "cp 'popmedia_server.rb', "+ dpath
 FileUtils.cp 'popmedia_server.rb', dpath
-puts "cp 'config.xml', "+ dpath
-FileUtils.cp 'config.xml', dpath
+#puts "cp 'config.xml', "+ dpath
+#FileUtils.cp 'config.xml', dpath
 puts "cp 'index.html', "+ dpath
 FileUtils.cp 'index.html', dpath
+puts "cp 'admin.html', "+ dpath
+FileUtils.cp 'admin.html', dpath
 puts "rm -r " + dpath + "'requires', "+ dpath
 FileUtils.rm_r dpath + 'requires', :force => true
 puts "cp -r 'requires', "+ dpath
@@ -39,6 +41,7 @@ FileUtils.rm_r dpath + 'images', :force => true
 puts "cp -r 'images', "+ dpath
 FileUtils.cp_r 'images', dpath
 
+#set up the data directory
 if File.exists?(dpath+'data')
 	#if !File.symlink?(dpath+'data')
 	#	puts "mv "+dpath+"data, "+dpath+'_data'
@@ -47,17 +50,18 @@ if File.exists?(dpath+'data')
 	#	FileUtils.ln_s dpath+'_data', dpath+'data'
 	#end
 else
-	if !File.exists?(dpath+'_data')
-		puts "mkdir " + dpath+'_data'
-		FileUtils.mkpath dpath+'_data'
-		puts "ln -s "+dpath+'_data'+", "+dpath+'data'
-		FileUtils.ln_s dpath+'_data', dpath+'data'
-	else
-		puts "ln -s "+dpath+'_data'+", "+dpath+'data'
-		FileUtils.ln_s dpath+'_data', dpath+'data'
-	end
+	#if !File.exists?(dpath+'_data')
+	#	puts "mkdir " + dpath+'_data'
+	#	FileUtils.mkpath dpath+'_data'
+	#	puts "ln -s "+dpath+'_data'+", "+dpath+'data'
+	#	FileUtils.ln_s dpath+'_data', dpath+'data'
+	#else
+	#	puts "ln -s "+dpath+'_data'+", "+dpath+'data'
+	#	FileUtils.ln_s dpath+'_data', dpath+'data'
+	#end
 end
 
+#set up the exposed direcory
 if !File.exists?(dpath+'exposed')
 	puts "mkdir " + dpath+'exposed'
 	FileUtils.mkpath dpath+'exposed'

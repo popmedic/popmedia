@@ -5,8 +5,8 @@ $CFGFNAME = 'config.xml'
 $DEBUG_POP = true
 
 require 'mongrel'
-require "rexml/document"
 
+require_relative "./requires/cfg.rb"
 require_relative "./requires/cratehandler.rb"
 require_relative "./requires/infohandler.rb"
 require_relative "./requires/searchhandler.rb"
@@ -20,15 +20,15 @@ class PopMedia_Server
     @ip_addr = IPSocket.getaddress(@server_name)
   end
   def load_cfg
-    cfgfile = File.new $CFGFNAME
-    @cfgxml = REXML::Document.new cfgfile
-    @port      = cfg_safe_get('/configuration/port'     , '8080').to_i
-    @doc_root  = "exposed" # cfg_safe_get('/configuration/doc_root' , "%s/exposed" % Dir::pwd)
-    @data_root = "data" # cfg_safe_get('/configuration/data_root', "%s/data" % Dir::pwd)
+  	@cfg = Cfg.new $CFGFNAME
+    @cfgxml = @cfg.xml
+    @port      = @cfg.get('port', '8080').to_i
+    @doc_root  = "exposed" # @cfg.get('doc_root' , "%s/exposed" % Dir::pwd)
+    @data_root = "data" # @cfg.get('data_root', "%s/data" % Dir::pwd)
     @media_types = Array.new
     @av_types = Array.new
     @a_types = Array.new
-    @apache_path = cfg_safe_get('/configuration/apache_path', false)
+    @apache_path = @cfg.get('apache_path', false)
     @cfgxml.root.elements.each("/configuration/media_types/type") do |element|
       @media_types << element.text.downcase
       kind = element.attributes["kind"]
@@ -59,7 +59,7 @@ class PopMedia_Server
     @server.register('/search', SearchHandler.new(@doc_root, @data_root, @apache_path, @media_types))
     @server.register('/crate', CrateHandler.new(@doc_root, @data_root, @apache_path, @media_types))
     @server.register('/info',   InfoHandler.new(@doc_root, @data_root, @apache_path, @media_types, @av_types, @a_types))
-    @server.register('/admin',   AdminHandler.new(@doc_root, @data_root, @apache_path, @media_types))
+    @server.register('/admin',   AdminHandler.new(@doc_root, @data_root, @apache_path, @media_types, @av_types, @a_types))
     
     Mongrel::DirHandler::add_mime_type('.mp4', 'video/mp4')
     Mongrel::DirHandler::add_mime_type('.mp3', 'audio/mp3')

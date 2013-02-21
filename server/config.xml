@@ -1,8 +1,8 @@
 <configuration>
 	<port>8080</port>
 	<media_types>
-		<type kind="av">mp4</type>
-		<type kind="a">mp3</type>
-	</media_types>
-	<apache_path>http://192.168.0.185/media2</apache_path>
+		<type kind='av'>mp4</type>
+		<type kind='a'>mp3</type>
+	<type kind='av'>m4v</type></media_types>
+	<apache_path>http://192.168.0.185/popmedia3.0/server</apache_path>
 </configuration>

@@ -44,33 +44,28 @@
 			}
 			.bread_crumb
 			{
+				
+			}
+			.button
+			{
 				display:inline-block;
 				font-size:10pt;
-				margin:2px;
-				padding-left:4px;
-				padding-right:4px;
+				margin:3px;
+				padding-top: 3px;
+				padding-bottom: 3px;
+				padding-left:8px;
+				padding-right:8px;
 				border:#ECECEC 1px solid;
 				border-radius:3px;
 				cursor:pointer;
-			}
-			.bread_crumb:hover
-			{
-				color:#A5A5A5;
+				text-align:center;
 			}
 			.info .button
 			{
-				display:inline-block;
-				font-size:12pt;
-				margin:2px;
 				margin-top:16px;
 				width:120px;
-				padding-left:4px;
-				padding-right:4px;
-				border:#ECECEC 1px solid;
-				border-radius:3px;
-				cursor:pointer;
 			}
-			.info .button:hover
+			.button:hover
 			{
 				color:#A5A5A5;
 			}
@@ -197,7 +192,7 @@
 			}
 			function add_bread_crumb(name, href)
 			{
-				$("#bread_crumbs").append("<div class=\"bread_crumb\" href=\""+ href +"\" name=\""+name+"\">"+name+"</div>");
+				$("#bread_crumbs").append("<div class=\"bread_crumb button\" href=\""+ href +"\" name=\""+name+"\">"+name+"</div>");
 				bread_crumb_names.push(name);
 				$("#bread_crumbs .bread_crumb").last().click(function(){
 					query($(this).attr("href"));
@@ -329,7 +324,7 @@
 								
 					$("#vplayer #vsrc").attr('src', href);
 					$("#vplayer").width(w);
-					$("#vplayer").height(h);
+					//$("#vplayer").height(h);
 					
 					$(".info #play_button").attr('src', '/images/stop_button.png');
 				}

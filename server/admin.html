@@ -1,0 +1,352 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Popmedia Settings</title>
+        <style>
+        	body 
+			{
+				background-color:#000;
+				color:#FFF;
+				font-family:Arial, Helvetica, sans-serif;
+				font-size:12pt;
+				text-align:center;
+			}
+			input[type=text] 
+			{
+				border-radius:5px;
+				border: #ECECEC 2px solid;
+				background-color: #000;
+				font-size:10pt;
+				color: #FFF;
+				padding-left:3px;
+			}
+			h1
+			{
+				display:inline;
+			}
+			h2
+			{
+				display:inline;
+			}
+			.button
+			{
+				display:inline-block;
+				font-size:10pt;
+				margin:3px;
+				padding-top: 3px;
+				padding-bottom: 3px;
+				padding-left:8px;
+				padding-right:8px;
+				border:#ECECEC 1px solid;
+				border-radius:3px;
+				cursor:pointer;
+				text-align:center;
+			}
+			.button:hover
+			{
+				color:#A5A5A5;
+			}
+			#path_table .button
+			{
+				width:32px;	
+			}
+			#exposed_table .button,
+			#media_types_table .button
+			{
+				width:8px;
+			}
+			#canvas
+			{
+				border-radius:5px;
+				border: #ECECEC 2px solid;
+				margin: 5px;
+				padding:10px;
+				text-align:left;
+				width:800px;
+			}
+			.round_border
+			{
+				border-radius:5px;
+				border:#ECECEC 1px solid;
+			}
+			#exposed_table
+			{
+				border-collapse:collapse;
+				width:690px;
+			}
+			#media_types_table
+			{
+				border-collapse:collapse;
+				width:340px;
+			}
+			#exposed_table td,
+			#media_types_table td
+			{
+				padding-top:3px;
+				padding-bottom:3px;
+				border-top:#ECECEC 1px solid;
+				vertical-align:middle;
+			}
+			#exposed_table th,
+			#media_types_table th
+			{
+				background-color:#666;
+				padding-left:8px;
+				padding-right:8px;
+				padding-top:4px;
+				padding-bottom:2px;
+				margin:1px;
+				border-radius:5px;
+				border-collapse:separate;
+				/*border:#ECECEC 1px solid;*/
+			}
+			#exposed_table input[type=text],
+			#media_types_table input[type=text]
+			{
+				margin-top:16px;
+			}
+		</style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+        <script>
+			base_path = "/admin/json";
+			
+			function set_data_path()
+			{
+				path = /*encodeURIComponent(*/$('#data_path').val().replace(/^ +/, '').replace(/ +$/, '')/*)*/;
+				if(path == '')
+				{
+					alert("Data path can not be empty.");
+					$("#data_path").focus();
+					return;
+				}
+				url = '/admin/set_data_path/' + path + '/json';
+				query(url);
+			}
+			function set_apache_path()
+			{
+				path = /*encodeURIComponent(*/$('#apache_path').val().replace(/^ +/, '').replace(/ +$/, '')/*)*/;
+				if(path == '')
+				{
+					alert("Apache path can not be empty.");
+					$("#apache_path").focus();
+					return;
+				}
+				url = '/admin/set_apache_path/' + path + '/json';
+				query(url);
+			}
+			function remove_exposed(name)
+			{
+				url = '/admin/remove_exposed/exposed/' + name + '/json';
+				query(url);	
+			}
+			function add_exposed()
+			{
+				name = $('#nexposed_name').val().replace(/^ +/, '').replace(/ +$/, '');
+				if(name == '')
+				{
+					alert("A new exposed name must be filled out.");
+					$("#nexposed_name").focus();
+					return;
+				}
+				path = $('#nexposed_path').val().replace(/^ +/, '').replace(/ +$/, '').replace(/^\//, '');
+				if(path == '')
+				{
+					alert("A new exposed path must be filled out.");
+					$("#nexposed_path").focus();
+					return;
+				}
+				url = '/admin/add_exposed/' + path + '/with_name/' + name + '/json';
+				query(url);
+			}
+			function add_media_type()
+			{
+				type = $('#nmedia_type').val().replace(/^ +/, '').replace(/ +$/, '');
+				if(type == '')
+				{
+					alert("A new media type must be filled out.");
+					$("#nmedia_type").focus();
+					return;
+				}
+				kind = $('#nmedia_type_kind').val().replace(/^ +/, '').replace(/ +$/, '').replace(/^\//, '');
+				/*if(kind != 'a' && kind != 'av')
+				{
+					alert("Media kind must be either av or a.\nav: audio/video\na: audio");
+					$("#nmedia_type_kind").focus();
+					return;
+				}*/
+				url = '/admin/add_media_type/' + type + '/as_kind/' + kind + '/json';
+				query(url);
+			}
+			function remove_media_type(mt)
+			{
+				url = '/admin/remove_media_type/' + mt + '/json';
+				query(url); 	
+			}
+			function draw_canvas(res)
+			{
+				$('#data_path').val(res['data_path']);
+				//$('#data_path').width(res['data_path'].length * 8);
+				$('#apache_path').val(res['apache_path']);
+				//$('#apache_path').width(res['apache_path'].length * 8);
+				
+				exposed = res['exposed'];
+				if(exposed != undefined)
+				{
+					if(exposed instanceof Array)
+					{
+						str = "<tr><th>Name</th><th width=\"100%\">Path</th><th>-/+</th></tr>";
+						for(i = 0; i < exposed.length; i++)
+						{
+							str += "<tr><td align=\"left\">"+
+								exposed[i]['name']+"</td><td  align=\"left\">"+
+								exposed[i]['path']+"</td><td  align=\"right\">"+
+								"<div class=\"button\" onclick=\"remove_exposed('"+exposed[i]['name']+"');\">-</div></td></tr>";
+						}
+						str += "<tr><td><input type=\"text\" id=\"nexposed_name\" value=\"\" placeholder=\"Name...\" size=\"15\" /></td>"+
+							   	   "<td align\"left\"><input type=\"text\" id=\"nexposed_path\" value=\"\" placeholder=\"Path...\" size=\"82\" /></td>"+	
+								   "<td align=\"right\" style=\"vertical-align:bottom;\"><div class=\"button\" onclick=\"add_exposed();\">+</div></td></tr>"
+						$('#exposed_table').html(str);
+					}
+					else
+					{
+						alert("exposed instanceof problem");
+					}
+				}
+				else
+				{
+					alert("exposed problem");
+				}
+				
+				media_types = res['media_types'];
+				av_types = res['av_types'];
+				a_types = res['a_types'];
+				//alert(media_types.join(", "));
+				//alert(av_types.join(", "));
+				//alert(a_types.join(", "));
+				
+				if(media_types != undefined && av_types != undefined && a_types != undefined)
+				{
+					if(media_types instanceof Array && av_types instanceof Array && a_types instanceof Array)
+					{
+						str = "<tr><th>Extension</th><th width=\"100%\">Kind</th><th>-/+</th></tr>";
+						for(i = 0; i < media_types.length; i++)
+						{
+							/*
+							kind = "unknown"
+							if(@av_types.include?(t))
+								kind = "av"
+							elsif(@a_types.include?(t))
+								kind = "a"
+							end
+							*/
+							kind = "unknown";
+							if(av_types.indexOf(media_types[i]) != -1)
+							{
+								kind = "av";
+							}
+							else if(a_types.indexOf(media_types[i]) != -1)
+							{
+								kind = "a";
+							}
+							str += "<tr><td align=\"left\">"+
+								media_types[i]+"</td><td  align=\"left\">"+
+								kind+"</td><td  align=\"right\">"+
+								"<div class=\"button\" onclick=\"remove_media_type('"+media_types[i]+"');\">-</div></td></tr>";
+						}
+						str += "<tr><td><input type=\"text\" id=\"nmedia_type\" value=\"\" placeholder=\"Extension of type...\" size=\"20\" /></td>"+
+							   	   "<td align\"left\"><input type=\"text\" id=\"nmedia_type_kind\" value=\"\" placeholder=\"Kind of file(a/av)...\" size=\"21\" /></td>"+	
+								   "<td align=\"right\" style=\"vertical-align:bottom;\"><div class=\"button\" onclick=\"add_media_type();\">+</div></td></tr>"
+						$('#media_types_table').html(str);
+					}
+					else
+					{
+						alert("media_types instanceof problem");
+					}
+				}
+				else
+				{
+					alert("media_types problem");
+				}
+				
+				if(res['msg'] != undefined)
+				{
+					if(res['msg']['result'] == "FAILURE")
+					{
+						alert(res['msg']['result']+": "+res['msg']['msg']);
+					}
+				}
+				//$('#canvas').show(500);
+			}
+			
+			function query(url)
+			{
+				//$('#canvas').hide(0);
+				$.ajax({
+  					url: url
+				}).done(function(res) {
+					draw_canvas(res);
+				}).fail(function() { 
+					$('#canvas').text("<div class=\"error\">error: unable to retrieve base data.</div>"); 
+				}).always(function() { 
+					//alert("AJAX complete.");
+				});
+			}
+			
+			$(document).ready(function(){
+				query(base_path);
+			});
+		</script>
+	</head>
+	<body><center>
+    	<h1>Popmedia 3.0:</h1><h2>Settings</h2>
+		<div id="canvas">
+        	<div>
+                <table id="path_table">
+                    <tr>
+                        <td align="right" style="padding-right:5px">
+                            <b>Location to store data:</b>
+                        </td>
+                        <td>
+                            <input type="text" id="data_path" value="" size="75" />
+                        </td>
+                        <td>
+                            <div class="button" onclick="set_data_path();">Set</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" style="padding-right:5px">
+                            <b>Location of Apache server:</b>
+                        </td>
+                        <td>
+                            <input type="text" id="apache_path" value="" size="75" />
+                        </td>
+                        <td>
+                            <div class="button" onclick="set_apache_path();">Set</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <hr />
+            <div>
+            	<b>Exposed Directories:</b>
+                <blockquote>
+                    <table id="exposed_table">
+                    
+                    </table>
+				</blockquote>
+            </div>
+            <hr />
+            <div>
+            	<b>Media Types:</b>
+                <blockquote>
+                    <table id="media_types_table">
+                    
+                    </table>
+				</blockquote>
+			</div>
+            <div id="msg">
+            	
+            </div>
+        </div>
+	</center></body>
+</html>
