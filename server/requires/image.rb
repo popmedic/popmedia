@@ -58,7 +58,9 @@ class Image
         end
       elsif("av".casecmp(kind) == 0)
         nfp = @path.gsub(/\.mp4$/, ".art[0].jpg")
-        mp4art_rtn = IO.popen(['mp4art', "--extract", @path], in: :close, err: :close).read
+        io = IO.popen(['mp4art', "--extract", @path], in: :close, err: :close)
+        mp4art_rtn = io.read
+        io.close()
         if(File.exists? nfp)
           FileUtils.mv nfp, img_path
           return "/" << img_path

@@ -12,6 +12,37 @@
 				font-family:Arial, Helvetica, sans-serif;
 				font-size:12pt;
 			}
+			.loading-animation
+			{
+				position:fixed;
+				height:64px;
+				width:64px;
+				border:#FFF thin solid;
+				border-radius:10px;
+			}
+			.loading-animation #sprite
+			{
+				position:relative;
+				top:31px;
+				left:1px;
+				height:1px;
+				width:31px;
+				background-color:#FFC;
+				opacity:1;
+				border-radius:5px;
+				z-index:98;
+			}
+			.loading-animation #text
+			{
+				position:absolute;
+				text-align:center;
+				vertical-align:middle;
+				/*font-family:Arial, Helvetica, sans-serif;*/
+				font-size:12px;
+				top:26px;
+				left:6px;
+				z-index:99;
+			}
 			#search_text
 			{
 				border-radius:5px;
@@ -163,12 +194,13 @@
 			}
 		</style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+        <script src="jscripts/loading-animation.js"></script>
         <script>
 			base_path = "/crate/exposed/json";
 			bread_crumb_names = [];
 			last_crate = [];
 			var TRange=null;
-
+			
 			function gen_info_key(str)
 			{
 				return str.substring(str.lastIndexOf('/')+1).replace(/,/g, '').
@@ -374,6 +406,8 @@
 			}
 			function draw_canvas(res){
 				$('#canvas').html('');
+				$('#canvas').show(150);
+				LoadingAnimation.destroy();
 				if(res instanceof Array)
 				{
 					if(res.length <= 0) 
@@ -392,7 +426,8 @@
 			}
 			function query(url)
 			{
-				$('#canvas').text("LOADING...");
+				$('#canvas').hide(75);
+				LoadingAnimation.create('body', 5, 'loading...', 10);
 				$.ajax({
   					url: url
 				}).done(function(res) {
