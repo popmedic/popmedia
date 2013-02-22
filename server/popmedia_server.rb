@@ -67,6 +67,7 @@ class PopMedia_Server
     @server.register("/%s" % [@data_root], Mongrel::DirHandler.new(@data_root))
     @server.register("/images", Mongrel::DirHandler.new("images"))
     @server.register("/html", Mongrel::DirHandler.new('index.html'))
+    @server.register("/jscripts", Mongrel::DirHandler.new('jscripts'))
     
     @server.run.join
   end

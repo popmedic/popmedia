@@ -36,6 +36,10 @@ puts "rm -r " + dpath + "'requires', "+ dpath
 FileUtils.rm_r dpath + 'requires', :force => true
 puts "cp -r 'requires', "+ dpath
 FileUtils.cp_r 'requires', dpath 
+puts "rm -r " + dpath + "'jscripts', "+ dpath
+FileUtils.rm_r dpath + 'jscripts', :force => true
+puts "cp -r 'jscripts', "+ dpath
+FileUtils.cp_r 'jscripts', dpath 
 puts "rm -r " + dpath + "'images', "+ dpath
 FileUtils.rm_r dpath + 'images', :force => true
 puts "cp -r 'images', "+ dpath
