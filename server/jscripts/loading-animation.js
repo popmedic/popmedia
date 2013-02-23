@@ -14,7 +14,7 @@ var LoadingAnimation = {
 		h = parseInt(s.css('height'));
 		c = s.css('background-color');
 		str = "no matrix";
-		/* Matrix 1 */
+		// Matrix 1
 		if(y < 32 && 
 		   h < 32 && 
 		   x < 32 && 
@@ -28,7 +28,7 @@ var LoadingAnimation = {
 			c = "#"+(y*8).toString(16)+(h*8).toString(16)+(w*8).toString(16);
 		}
 		
-		/* Matrix 2 */
+		// Matrix 2 
 		if(y < 32 && h <= 32 && x == 32 && w < 32)
 		{
 			w++;
@@ -38,7 +38,7 @@ var LoadingAnimation = {
 			c = "#"+(y*8).toString(16)+(h*8).toString(16)+(w*8).toString(16);
 		}
 		
-		/* Matrix 3 */
+		// Matrix 3 
 		if(y == 32 && h < 32 && x == 32 && w <= 32)
 		{
 			w--;
@@ -48,7 +48,7 @@ var LoadingAnimation = {
 			c = "#"+(y*8).toString(16)+(h*8).toString(16)+(w*8).toString(16);
 		}
 		
-		/* Matrix 4 */
+		// Matrix 4 
 		if(y == 32 && h <= 32 && x < 32 && w < 32)
 		{
 			w++;
@@ -84,8 +84,8 @@ var LoadingAnimation = {
 		this.wait_time = text_wait;
 		this.cls = cls;
 		
-		w = $(document).width();
-		h = $(document).height();
+		w = $(window).width();
+		h = $(window).height();
 		l = (w/2)-32;
 		t = (h/2)-32;
 		if($('.loading-animation').length > 0)

@@ -32,19 +32,19 @@ class Image
         #  return "/" << crate_img_path
         #end
         if(data == nil)
-          Mp3Info.open(@path) do |mp3|
-          	pic = mp3.tag2.pictures
-          	if(pic != nil)
-							if(pic.length > 1)
-								data = pic[0][1];
-							else
+          #Mp3Info.open(@path) do |mp3|
+          #	pic = mp3.tag2.pictures
+          #	if(pic != nil)
+					#		if(pic.length > 1)
+					#			data = pic[0][1];
+					#		else
 								otag = ID3Lib::Tag.new(@path)
 								if(otag.frame(:APIC))
 									data = otag.frame(:APIC)[:data]
 								end
-							end
-						end
-          end
+					#		end
+					#	end
+          #end
         end
         if(data != nil)
         	File.binwrite(img_path, data)
