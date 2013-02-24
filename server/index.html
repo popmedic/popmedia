@@ -17,7 +17,7 @@
 				position:fixed;
 				height:64px;
 				width:64px;
-				border:#FFF thin solid;
+				border:#ECECEC 1px solid;
 				border-radius:10px;
 			}
 			.loading-animation #sprite
@@ -329,7 +329,9 @@
 					      "prev_click('"+add_slashes(encodeURIComponent(gen_info_key(info.href)))+"');\">Previous</div>"+
 						  "<div class=\"button\" onclick=\"javascript:"+
 						  "next_click('"+add_slashes(encodeURIComponent(gen_info_key(info.href)))+"');\">Next</div>"+
-						  "</div></div><div class=\"section\"><h2>"+info.album+"</h2><h3>"+info.artist+"</h3>"+
+						  "</div><div><div class=\"button\" onclick=\"window.open('download/"+info.path.substr(0, info.path.lastIndexOf("/"))+"','_blank');\">"+
+						  "Download Album</div><div class=\"button\" onclick=\"window.open('download/"+info.path+"','_blank');\">"+
+						  "Download</div></div></div><div class=\"section\"><h2>"+info.album+"</h2><h3>"+info.artist+"</h3>"+
 						  "<p>Year: "+info.year+"<br />Genre: "+info.genre+"</p>"+
 						  "</div></div>";
 				}

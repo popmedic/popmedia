@@ -13,6 +13,7 @@ class Info
     end
     @path = path
     @hash = Hash.new
+    @hash['path'] = @path
     @real_path = File.realpath path
     @data_root = data_root
     @types = types

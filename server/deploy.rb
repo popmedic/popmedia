@@ -26,21 +26,23 @@ end
 
 puts "cp 'popmedia_server.rb', "+ dpath
 FileUtils.cp 'popmedia_server.rb', dpath
+puts "cp 'popmedia_server_control.rb', "+ dpath
+FileUtils.cp 'popmedia_server_control.rb', dpath
 #puts "cp 'config.xml', "+ dpath
 #FileUtils.cp 'config.xml', dpath
 puts "cp 'index.html', "+ dpath
 FileUtils.cp 'index.html', dpath
 puts "cp 'admin.html', "+ dpath
 FileUtils.cp 'admin.html', dpath
-puts "rm -r " + dpath + "'requires', "+ dpath
+puts "rm -r " + dpath + "requires"
 FileUtils.rm_r dpath + 'requires', :force => true
 puts "cp -r 'requires', "+ dpath
 FileUtils.cp_r 'requires', dpath 
-puts "rm -r " + dpath + "'jscripts', "+ dpath
+puts "rm -r " + dpath + 'jscripts'
 FileUtils.rm_r dpath + 'jscripts', :force => true
 puts "cp -r 'jscripts', "+ dpath
 FileUtils.cp_r 'jscripts', dpath 
-puts "rm -r " + dpath + "'images', "+ dpath
+puts "rm -r " + dpath + 'images'
 FileUtils.rm_r dpath + 'images', :force => true
 puts "cp -r 'images', "+ dpath
 FileUtils.cp_r 'images', dpath

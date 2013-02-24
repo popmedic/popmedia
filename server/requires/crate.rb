@@ -193,4 +193,14 @@ class Crate
     rtn << "</ul></body></html>"
     return rtn
   end
+  def Crate::is_album?(path)
+		if(File.directory? path)
+			Dir.foreach(path) do |file|
+				if(File.extname(file).casecmp(".mp3") == 0 && file[0] != ".")
+					return true
+				end
+			end
+		end
+		return false
+  end
 end
