@@ -6,6 +6,7 @@ class Image
   @@crate_img  = "/images/crate.png"
   @@afile_img  = "/images/afile.png"
   @@avfile_img = "/images/avfile.png"
+  @@unkfile_img = "/images/unkfile.png"
   def initialize data_root, path
     @data_root = data_root
     @path = File.realpath path
@@ -13,11 +14,18 @@ class Image
   def image_path
     img_path = "%s/%s.jpg" % [@data_root, Digest::MD5.hexdigest(@path)]
     if(!File.exists?(img_path))
-      if(!create_crate_image(img_path))
-        if(File.extname(@path).downcase == '.mp3')
-          return create_image "a"
+      if(File.directory? @path)
+      	if(!create_crate_image(img_path))
+        	return @@crate_img
         end
-        return @@crate_img
+      else
+      	if(File.extname(@path).downcase == ".mp4")
+       		return create_image "av"
+       	elsif(File.extname(@path).downcase == ".mp3")
+       		return create_image "a"
+       	else
+       		return @@unkfile_img
+       	end
       end
     end
     return "/" << img_path
@@ -80,8 +88,10 @@ class Image
       else
       	if(default_img != false)
 					return default_img
+				elsif(File.directory?(@path))
+					return @@crate_img
 				end
-        return @@crate_img
+				return @@avfile_img
       end
     end
     return "/" << img_path
