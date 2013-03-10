@@ -27,7 +27,6 @@ class StatHandler < Mongrel::HttpHandler
 				filter = "%s/**{,/*/**}/*.{%s}" % [path.chomp('/'), @a_types.join(',')]
 				rtn["a_count"] = Dir[filter].length
 				rtn["media_count"] = rtn["av_count"] + rtn["a_count"]
-				rtn["msg"] = "SUCCESS"
 				out << rtn.to_json
 			rescue => e
 				out << { "ERROR" => e.to_s }.to_json
