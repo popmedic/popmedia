@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="viewport" content="width=240,user-scalable=no" />
+        <!--meta name="viewport" content="width=240,user-scalable=no" /-->
         <title>Popmedia</title>
         <style>
 			body 
@@ -95,6 +95,8 @@
 			{
 				margin-top:16px;
 				width:120px;
+				text-decoration:none;
+				color:#FFF;
 			}
 			.button:hover
 			{
@@ -288,6 +290,10 @@
 				ni = next_info(key);
 				query(ni.info+'/json');
 			}
+			function pop_download(href)
+			{
+				window.open(href);
+			}
 			function draw_info(info){
 				str = "<div class=\"error\">unable to retrieve info on "+info.href+"</div>"
 				if(info.type == "av")
@@ -301,6 +307,7 @@
 						  "prev_click('"+add_slashes(encodeURIComponent(gen_info_key(info.href)))+"');\">Previous</div>"+
 						  "<div class=\"button\" onclick=\"javascript:"+
 						  "next_click('"+add_slashes(encodeURIComponent(gen_info_key(info.href)))+"');\">Next</div></div>"+
+						  "<a class=\"button\" href=\""+add_slashes(info.href)+"\" download>Download</a>"+
 						  "</div><div class=\"section\">";
 					if(info.Media_Type == "TV Show")
 					{
