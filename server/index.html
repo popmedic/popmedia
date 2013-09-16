@@ -292,7 +292,12 @@
 			}
 			function pop_download(href)
 			{
+				href.replace(/http/, 'ftp')
 				window.open(href);
+			}
+			function mark_av(href)
+			{
+				window.open("http://10.0.0.7/popmedia3.0/add_cp.php?href="+encodeURIComponent(href));
 			}
 			function draw_info(info){
 				str = "<div class=\"error\">unable to retrieve info on "+info.href+"</div>"
@@ -307,8 +312,10 @@
 						  "prev_click('"+add_slashes(encodeURIComponent(gen_info_key(info.href)))+"');\">Previous</div>"+
 						  "<div class=\"button\" onclick=\"javascript:"+
 						  "next_click('"+add_slashes(encodeURIComponent(gen_info_key(info.href)))+"');\">Next</div></div>"+
+						  "<div><div class=\"button\" onclick=\"javascript:"+
+						  "mark_av('"+info.href+"');\">Mark Video</div>"+
 						  "<a class=\"button\" href=\""+add_slashes(info.href)+"\" download>Download</a>"+
-						  "</div><div class=\"section\">";
+						  "</div></div><div class=\"section\">";
 					if(info.Media_Type == "TV Show")
 					{
 						str += "<h2>"+info.TV_Show+"</h2><h3>"+info.Album+"</h3>"+
@@ -487,9 +494,10 @@
                 <input type="text" value="" id="find_text" placeholder="Find on page..." />
                 <input type="text" value="" id="search_text" placeholder="Search site..." />
                 </td>
-      		</tr>
-      	</table>
-        <div id="canvas">
-        </div>
+      	</tr>
+    </table>
+    <div id="canvas">
+    </div>
+    <div id="result" style="visibility:visible;"></div>
 	</body>
 </html>
